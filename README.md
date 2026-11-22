@@ -7,6 +7,8 @@ python -m pip install -r requirements.txt
 python auditar.py RUTA_CAPTURAS resultados
 python verificar.py resultados
 python comunidades.py resultados comunidades
+python validar_objetivos.py resultados comunidades validacion
+python contraste_textual.py RUTA_CAPTURAS resultados comunidades validacion
 ```
 
 Usa Python 3.10 o posterior. La carpeta de capturas debe incluir MANIFIESTO_SHA256.txt. Los resultados se escriben en una carpeta independiente.

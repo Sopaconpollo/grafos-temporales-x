@@ -1,5 +1,6 @@
 resultados/
 comunidades/
+validacion/
 *.ndjson
 *.csv
 *.mtx
