@@ -1,0 +1,8 @@
+resultados/
+comunidades/
+*.ndjson
+*.csv
+*.mtx
+*.zip
+__pycache__/
+.venv/
