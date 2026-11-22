@@ -1,6 +1,7 @@
 resultados/
 comunidades/
 validacion/
+fichas_revision.json
 *.ndjson
 *.csv
 *.mtx
