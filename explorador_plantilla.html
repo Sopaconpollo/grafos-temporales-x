@@ -1,0 +1,193 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Explorador de grafos · X Colombia 2026</title>
+<style>
+:root{--ink:#102e32;--muted:#476468;--line:#d7e4e0;--teal:#006861;--paper:#f4f7f2;--white:#fff;--warm:#f5dda7}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:system-ui,sans-serif;line-height:1.5}
+main{max-width:1400px;padding:38px clamp(14px,4vw,62px) 44px;margin:auto}
+header{margin-bottom:24px}
+.eyebrow{letter-spacing:.13em;text-transform:uppercase;color:var(--teal);font-size:.78rem;font-weight:750}
+h1,h2{font-family:Georgia,serif;letter-spacing:-.035em;line-height:1.08}
+h1{font-size:clamp(2.5rem,5vw,4.6rem);margin:.15em 0 .2em}
+h2{margin:0 0 .42em;font-size:1.68rem}
+p{margin:.35em 0 1em}.muted{color:var(--muted)}
+.controls,.months{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.controls{margin:14px 0 18px;gap:16px}
+.controls label{display:flex;align-items:center;gap:8px;color:var(--muted);font-size:.88rem}
+button,select{border:1px solid #9cb5af;border-radius:5px;background:var(--white);color:var(--ink);padding:7px 12px;font:inherit;cursor:pointer}
+button[aria-pressed=true]{background:var(--teal);color:white;border-color:var(--teal)}
+:focus-visible{outline:3px solid #c87508;outline-offset:3px}
+.workspace{display:grid;grid-template-columns:minmax(0,2.15fr) minmax(258px,1fr);gap:14px;align-items:start}
+.panel{background:var(--white);border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.chart-head,.side{padding:16px 18px}.chart-head{border-bottom:1px solid var(--line);display:flex;justify-content:space-between;gap:14px;align-items:start}
+.chart-head h2{margin:0}.chart-head p{margin:6px 0 0}.chart-head label{font-size:.82rem;white-space:nowrap}
+svg{width:100%;display:block;height:auto}
+#graph{background:#edf4f0}#detail{background:#f1f6f2;border-radius:4px;margin:8px 0}
+.group{cursor:pointer}.group text{pointer-events:none;font-weight:800;fill:#fff;font-size:12px;text-anchor:middle;dominant-baseline:middle}
+.group:focus circle{stroke:#b7570d;stroke-width:4px}
+.key{padding:11px 16px;color:var(--muted);font-size:.82rem;border-top:1px solid var(--line);margin:0}
+.stats{display:grid;grid-template-columns:repeat(2,1fr);gap:9px;margin:0 0 18px}.stats div{background:#eaf3ee;padding:7px 10px;border-radius:4px}
+.stats dt{color:var(--muted);font-size:.76rem}.stats dd{margin:0;font-size:1.3rem;font-weight:730;font-variant-numeric:tabular-nums}
+#community{max-width:100%;margin:.15rem 0 .6rem}.fine{font-size:.82rem}.note{margin-top:18px}.note summary{cursor:pointer}
+@media(max-width:790px){.workspace{grid-template-columns:1fr}.chart-head{flex-wrap:wrap}.side{padding-bottom:10px}}
+</style>
+</head>
+<body>
+<main>
+<header><p class="eyebrow">Teoría de grafos · Colombia 2026</p><h1>Comunidades en X</h1><p class="muted">Explora la red de interacciones observadas entre enero y junio.</p></header>
+<div class="months" role="group" aria-label="Mes de la red" id="months"></div>
+<div class="controls">
+<label>Capa <select id="layer"><option value="all">Agregada</option><option value="mention">Menciones</option><option value="reply">Respuestas</option><option value="quote">Citas</option></select></label>
+<label>Partición <select id="mode"><option value="modularidad">Modularidad voraz</option><option value="espectral">Bipartición espectral</option></select></label>
+</div>
+<div class="workspace">
+<section class="panel" aria-labelledby="graph-title">
+<div class="chart-head"><div><h2 id="graph-title">Grafo de comunidades</h2><p class="fine muted" id="summary" aria-live="polite"></p></div>
+<label>Aristas <select id="limit"><option value="60">60 de mayor peso</option><option value="150">150 de mayor peso</option><option value="all">Todas</option></select></label></div>
+<svg id="graph" viewBox="0 0 820 500" role="group" aria-label="Grafo dirigido entre comunidades"></svg>
+<p class="key">Los círculos más grandes representan grupos con más cuentas. Las flechas más gruesas representan más interacciones. Selecciona un círculo para examinarlo.</p>
+</section>
+<aside class="panel side" aria-labelledby="community-title">
+<h2 id="community-title">Dentro de una comunidad</h2>
+<label class="fine" for="community">Grupo del mes seleccionado</label>
+<select id="community"></select>
+<dl class="stats" id="stats" aria-live="polite"></dl>
+<svg id="detail" viewBox="0 0 310 230" role="img" aria-label="Vista de conexiones internas entre cuentas anónimas"></svg>
+<p id="detail-summary" class="fine muted"></p>
+</aside>
+</div>
+<details class="note fine muted"><summary>Cómo leer el explorador</summary>
+<p>Las particiones se calcularon en la componente débil mayor. Las flechas entre comunidades suman eventos del grupo de origen al de destino. Los vínculos internos se muestran al seleccionar una comunidad. Cada grupo se numera por tamaño dentro de su propia vista, de modo que G1 de enero y G1 de febrero pueden reunir cuentas distintas. La capa de republicaciones quedó vacía por falta de referencias explícitas.</p>
+</details>
+</main>
+<script id="graph-data" type="application/json">__GRAPH_DATA__</script>
+<script>
+const data=JSON.parse(document.getElementById('graph-data').textContent);
+const months=Object.keys(data);
+const labels=['Enero','Febrero','Marzo','Abril','Mayo','Junio'];
+const $=id=>document.getElementById(id);
+const fmt=new Intl.NumberFormat('es-CO');
+const pct=new Intl.NumberFormat('es-CO',{style:'percent',maximumFractionDigits:1});
+const colours=['#08736a','#235f92','#98502a','#635290','#447041','#943e65'];
+const SVG='http://www.w3.org/2000/svg';
+const state={month:months[0],group:0};
+function svg(tag,attrs,parent){
+  const node=document.createElementNS(SVG,tag);
+  for(const [key,value] of Object.entries(attrs)) node.setAttribute(key,value);
+  if(parent)parent.append(node);
+  return node;
+}
+function assign(node,text){node.textContent=text;return node}
+function graphData(){return data[state.month][$('layer').value]}
+function selectedMode(){return graphData().modes[$('mode').value]}
+function arrow(svgNode,id){
+  const defs=svg('defs',{},svgNode);
+  const marker=svg('marker',{id,viewBox:'0 0 8 8',refX:7,refY:4,markerWidth:6,markerHeight:6,orient:'auto-start-reverse',markerUnits:'userSpaceOnUse'},defs);
+  svg('path',{d:'M0 0 L8 4 L0 8 z',fill:'#406861'},marker);
+}
+function positions(groups,links){
+  const max=groups[0][0];
+  if(groups.length===2)return groups.map((g,i)=>({x:270+i*280,y:250,r:12+46*Math.sqrt(g[0]/max)}));
+  const pts=groups.map((g,i)=>{
+    const a=i*2.39996, r=22*Math.sqrt(i);
+    return {x:410+1.65*r*Math.cos(a),y:250+r*Math.sin(a),r:6+36*Math.sqrt(g[0]/max)};
+  });
+  for(let k=0;k<125;k++){
+    const damping=(1-k/135)*.12;
+    for(let i=0;i<pts.length;i++)for(let j=i+1;j<pts.length;j++){
+      const a=pts[i],b=pts[j],x=b.x-a.x,y=b.y-a.y,d=Math.hypot(x,y)||1;
+      const push=Math.max(0,a.r+b.r+18-d)*damping+Math.min(.85,75/(d*d));
+      a.x-=push*x/d;a.y-=push*y/d;b.x+=push*x/d;b.y+=push*y/d;
+    }
+    for(const [i,j,w] of links.slice(0,90)){
+      const a=pts[i],b=pts[j],x=b.x-a.x,y=b.y-a.y,d=Math.hypot(x,y)||1;
+      const pull=Math.max(0,d-135)*damping*.048*Math.min(4,Math.log1p(w));
+      a.x+=pull*x/d;a.y+=pull*y/d;b.x-=pull*x/d;b.y-=pull*y/d;
+    }
+    for(const a of pts){
+      a.x=Math.max(a.r+14,Math.min(806-a.r,a.x));a.y=Math.max(a.r+14,Math.min(486-a.r,a.y));
+    }
+  }
+  return pts;
+}
+function connection(root,a,b,cfg){
+  const x=b.x-a.x,y=b.y-a.y,d=Math.hypot(x,y)||1,ux=x/d,uy=y/d,offset=cfg.bend;
+  const ax=a.x+ux*(a.r+1)-uy*offset,ay=a.y+uy*(a.r+1)+ux*offset;
+  const bx=b.x-ux*(b.r+4)-uy*offset,by=b.y-uy*(b.r+4)+ux*offset;
+  const link=svg('line',{x1:ax,y1:ay,x2:bx,y2:by,stroke:cfg.stroke,'stroke-width':cfg.width,opacity:cfg.opacity,'marker-end':'url(#'+cfg.arrow+')'},root);
+  assign(svg('title',{},link),cfg.title);
+}
+function paint(){
+  const graph=graphData(), mode=selectedMode();
+  const ranked=[...mode.links].sort((a,b)=>b[2]-a[2]);
+  const count=$('limit').value==='all'?ranked.length:Number($('limit').value);
+  const visible=ranked.slice(0,count), root=$('graph');
+  root.replaceChildren();arrow(root,'community-arrow');
+  const pts=positions(mode.groups,ranked);
+  const reverse=new Set(visible.map(([a,b])=>a+':'+b));
+  const strongest=ranked[0]?.[2]??1;
+  for(const [a,b,w] of visible){
+    const highlight=a===state.group||b===state.group;
+    connection(root,pts[a],pts[b],{bend:reverse.has(b+':'+a)?3:0,width:1+4*Math.sqrt(w/strongest),
+      opacity:highlight ? .82 : .33,stroke:highlight?'#155a52':'#63877f',arrow:'community-arrow',
+      title:'G'+(a+1)+' a G'+(b+1)+' · '+fmt.format(w)+' eventos'});
+  }
+  pts.forEach((p,i)=>{
+    const size=mode.groups[i][0];
+    const node=svg('g',{class:'group',tabindex:0,role:'button','aria-pressed':String(i===state.group),
+      'aria-label':'Grupo '+(i+1)+', '+fmt.format(size)+' cuentas'},root);
+    svg('circle',{cx:p.x,cy:p.y,r:p.r,fill:colours[i%colours.length],stroke:i===state.group?'#c06b18':'#f8fbf7','stroke-width':i===state.group?4:2},node);
+    if(p.r>=14)assign(svg('text',{x:p.x,y:p.y},node),'G'+(i+1));
+    assign(svg('title',{},node),'Grupo '+(i+1)+' · '+fmt.format(size)+' cuentas');
+    node.addEventListener('click',()=>chooseGroup(i,true));
+    node.addEventListener('keydown',e=>{if(['Enter',' '].includes(e.key)){e.preventDefault();chooseGroup(i,true)}});
+  });
+  assign($('summary'),mode.groups.length+' grupos · '+fmt.format(graph.lcc)+' de '+fmt.format(graph.total)+' cuentas en la componente mayor ('+pct.format(graph.lcc/graph.total)+') · '+visible.length+' de '+ranked.length+' aristas entre grupos');
+}
+function drawDetail(){
+  const {groups,links}=selectedMode(), selected=groups[state.group];
+  const [size,internal,arcs,shown,edges]=selected;
+  const outbound=links.filter(([a])=>a===state.group).reduce((sum,[,,w])=>sum+w,0);
+  const inbound=links.filter(([,b])=>b===state.group).reduce((sum,[,,w])=>sum+w,0);
+  const entries=[['Cuentas',size],['Eventos internos',internal],['Salen a otros grupos',outbound],['Entran de otros grupos',inbound]];
+  $('stats').replaceChildren();
+  for(const [label,value] of entries){
+    const box=document.createElement('div');assign(box.appendChild(document.createElement('dt')),label);
+    assign(box.appendChild(document.createElement('dd')),fmt.format(value));$('stats').append(box);
+  }
+  const root=$('detail');root.replaceChildren();arrow(root,'account-arrow');
+  const points=Array.from({length:shown},(_,i)=>{const a=i*2*Math.PI/shown-Math.PI/2;return{x:155+112*Math.cos(a),y:115+83*Math.sin(a),r:5}});
+  const largest=Math.max(1,...edges.map(e=>e[2]));
+  for(const [a,b,w] of edges)connection(root,points[a],points[b],{bend:1.5,width:1+2.5*Math.sqrt(w/largest),
+    opacity:.55,stroke:'#42776d',arrow:'account-arrow',title:'Cuenta '+(a+1)+' a cuenta '+(b+1)+' · '+fmt.format(w)+' eventos'});
+  points.forEach((p,i)=>assign(svg('title',{},svg('circle',{cx:p.x,cy:p.y,r:p.r,fill:'#08736a'},root)),'Cuenta anónima '+(i+1)));
+  assign($('detail-summary'),shown+' de '+fmt.format(size)+' cuentas · '+edges.length+' de '+fmt.format(arcs)+' arcos internos. Se muestran hasta 24 cuentas por peso interno.');
+}
+function chooseGroup(i,focus=false){
+  state.group=i;$('community').value=i;paint();drawDetail();
+  if(focus)$('graph').querySelectorAll('.group')[i]?.focus();
+}
+function reset(){
+  state.group=0;$('community').replaceChildren();
+  selectedMode().groups.forEach(([size],i)=>{const el=document.createElement('option');el.value=i;assign(el,'G'+(i+1)+' · '+fmt.format(size)+' cuentas');$('community').append(el)});
+  chooseGroup(0);
+}
+months.forEach((month,i)=>{
+  const button=assign(document.createElement('button'),labels[i]);button.type='button';
+  button.setAttribute('aria-pressed',String(month===state.month));$('months').append(button);
+  button.addEventListener('click',()=>{
+    state.month=month;
+    [...$('months').children].forEach((child,k)=>child.setAttribute('aria-pressed',String(k===i)));
+    reset();
+  });
+});
+$('layer').addEventListener('change',reset);$('mode').addEventListener('change',reset);
+$('limit').addEventListener('change',paint);
+$('community').addEventListener('change',e=>chooseGroup(Number(e.target.value)));
+reset();
+</script>
+</body>
+</html>

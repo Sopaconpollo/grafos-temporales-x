@@ -12,6 +12,7 @@ python contraste_textual.py RUTA_CAPTURAS resultados comunidades validacion
 python muestra_revision.py RUTA_CAPTURAS resultados fichas_revision.json
 python analisis_ampliado.py RUTA_CAPTURAS resultados analisis_ampliado
 python figuras_g16.py analisis_ampliado g16_figuras
+python explorador_grafos.py resultados comunidades explorador_plantilla.html explorador_grafos.html
 ```
 
 Usa Python 3.10 o posterior. La carpeta de capturas debe incluir MANIFIESTO_SHA256.txt. Los resultados se escriben en una carpeta independiente.
