@@ -1,6 +1,7 @@
 resultados/
 comunidades/
 validacion/
+analisis_ampliado/
 fichas_revision.json
 *.ndjson
 *.csv
