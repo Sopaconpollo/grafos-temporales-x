@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sustentación · Comunidades temporales en X</title>
+<style>
+:root{--ink:#142e2b;--dim:#4d675e;--bg:#f5f4e9;--accent:#087665;--lime:#d9ebac;--rule:#aebdb0}
+*{box-sizing:border-box}body{margin:0;color:var(--ink);background:var(--bg);font-family:system-ui,sans-serif}
+.slide{max-width:1200px;margin:auto;padding:clamp(2rem,5.5vw,5.3rem);min-height:calc(100dvh - 65px);display:flex;flex-direction:column;justify-content:center;border-bottom:1px solid var(--rule)}
+.slide[hidden]{display:none}h1,h2{font-family:Georgia,serif;line-height:1.04;letter-spacing:-.035em;margin:0 0 .55em}h1{font-size:clamp(2.75rem,7.4vw,6.6rem);max-width:13ch}h2{font-size:clamp(2.2rem,5.15vw,4.4rem);max-width:22ch}h3,p,li,td,th{font-size:clamp(.97rem,1.9vw,1.43rem);line-height:1.5}p{max-width:65ch;margin:.45rem 0 1rem}li{margin:.5rem 0}ul,ol{padding-left:1.35em;margin:.2rem 0 1rem}.overline{font-size:.86rem;text-transform:uppercase;letter-spacing:.14em;color:var(--accent);font-weight:750;margin:0 0 1.25rem}.cover .overline{color:var(--lime)}.cover{background:#173b34;color:#f6f4e8;max-width:none;padding-inline:max(6vw,calc((100vw - 1040px)/2))}.cover p{margin:.3rem 0}.cover .date{color:var(--lime);margin-bottom:1.4rem}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1.4rem}.metric{background:var(--lime);padding:1.2rem 1.4rem;border-radius:4px}.metric strong{display:block;font-family:Georgia,serif;font-size:clamp(2rem,4.5vw,4rem);line-height:1.1;letter-spacing:-.04em}.metric p{margin:.4rem 0 0}.caption{color:var(--dim);font-size:clamp(.84rem,1.45vw,1.12rem)}table{border-collapse:collapse;width:100%;max-width:790px;margin:.25rem 0 1.1rem;text-align:left}td,th{padding:.38rem .65rem;border-bottom:1px solid var(--rule)}td:not(:first-child),th:not(:first-child){text-align:right}.bars{margin:.4rem 0 1.4rem;display:grid;gap:.54rem;max-width:740px}.bar{display:grid;grid-template-columns:3.3em 1fr 4.3em;align-items:center;gap:.7rem;font-variant-numeric:tabular-nums}.track{background:#e0e5d9;height:1em;border-radius:3px;overflow:hidden}.fill{display:block;height:100%;background:var(--accent);width:var(--value)}.bar strong{text-align:right}.equation{border-left:4px solid var(--accent);padding:.5rem 1rem;margin:.6rem 0;font-family:Georgia,serif;font-size:clamp(1.2rem,2.8vw,2.3rem)}details{max-width:58rem;margin-top:1rem;color:var(--dim)}summary{cursor:pointer;font-weight:650}details p{font-size:1rem;margin:.45rem 0}a{color:var(--accent)}
+nav{position:sticky;bottom:0;display:flex;gap:.65rem;justify-content:center;align-items:center;padding:.6rem;background:var(--bg);border-top:1px solid var(--rule)}button{font:inherit;padding:.45rem .8rem;background:#fff9;border:1px solid var(--accent);border-radius:4px;color:var(--ink);cursor:pointer}button:disabled{opacity:.45;cursor:default}output{font-variant-numeric:tabular-nums;text-align:center;min-width:5ch}button:focus-visible,summary:focus-visible{outline:3px solid var(--accent);outline-offset:4px}
+nav[hidden]{display:none}
+@media(max-width:620px){.grid{grid-template-columns:1fr;gap:.65rem}.slide{padding:1.5rem 1.1rem;justify-content:flex-start}.cover{justify-content:center}td,th{padding:.25rem .3rem}}
+@media print{@page{size:landscape;margin:0}*{print-color-adjust:exact;-webkit-print-color-adjust:exact}.slide,.slide[hidden]{display:flex;min-height:100vh;break-after:page;padding:7vh 9vw}.slide:last-of-type{break-after:auto}nav,details{display:none}h2{font-size:42pt}}
+</style>
+</head>
+<body>
+<main>
+<section class="slide cover" aria-labelledby="s1">
+<p class="overline">Teoría de Grafos · Universidad del Rosario</p>
+<h1 id="s1">Comunidades políticas en X</h1>
+<p class="date">Ciclo presidencial colombiano · Enero a junio de 2026</p>
+<p>Juan Sebastian Mora Cabrera<br>Sara Valentina Figueredo Laserna</p>
+<p>Profesor Daniel Alfonso Bojacá Torres</p>
+</section>
+<section class="slide" aria-labelledby="s2">
+<p class="overline">Pregunta de investigación</p>
+<h2 id="s2">¿Qué comunidades se mantienen de un mes a otro?</h2>
+<p>Medimos la conectividad, comparamos particiones y evaluamos cuánto cambian los grupos al modificar el peso de las interacciones.</p>
+<details><summary>Nota para la sustentación</summary><p>Enmarquen el proyecto como análisis de una red de interacciones observadas en búsquedas sobre política y candidaturas. La afinidad ideológica requeriría datos adicionales.</p></details>
+</section>
+<section class="slide" aria-labelledby="s3">
+<p class="overline">Corpus y control de calidad</p>
+<h2 id="s3">De las capturas a un corpus verificable</h2>
+<div class="grid"><div class="metric"><strong>37.069</strong><p>publicaciones únicas dentro del periodo</p></div><div class="metric"><strong>28 de 28</strong><p>capturas verificadas con SHA-256</p></div></div>
+<p>De 39.787 filas se retiraron 2.667 copias adicionales y 51 publicaciones fuera de ventana. Dos días quedaron sin registros observados.</p>
+<p>Los 42 eventos revisados coincidieron con las capturas. En la revisión temática, 32 de 48 textos tenían contenido electoral explícito.</p>
+<details><summary>Nota para la sustentación</summary><p>La codificación temática fue de ocho textos por mes y una sola revisión por texto. Los 42 eventos son una comprobación de extracción y no miden las relaciones que pudieron quedar omitidas.</p></details>
+</section>
+<section class="slide" aria-labelledby="s4">
+<p class="overline">Modelo matemático</p>
+<h2 id="s4">Una red dirigida por mes y tipo de interacción</h2>
+<p>Cada cuenta es un nodo. Cada evento vincula al autor con un destinatario identificable. El peso es el número de eventos por par y tipo.</p>
+<p><b>43.901</b> eventos resueltos · <b>35.832</b> aristas ponderadas por mes y tipo, sin autolazos</p>
+<div class="equation">S = A + Aᵀ &nbsp; · &nbsp; ℒ = I − D<sup>−½</sup>SD<sup>−½</sup></div>
+<p class="caption">La adyacencia dirigida conserva la dirección. La proyección simétrica se usa para el análisis espectral.</p>
+<details><summary>Nota para la sustentación</summary><p>Las capas con evidencia fueron respuestas, menciones y citas. Los datos carecían de referencias estructuradas para reconstruir republicaciones. Se excluyeron 764 autolazos del grafo y se conservaron en el registro de eventos.</p></details>
+</section>
+<section class="slide" aria-labelledby="s5">
+<p class="overline">Conectividad</p>
+<h2 id="s5">La componente mayor abarcó una fracción menor de la red</h2>
+<p class="caption">Porcentaje de nodos de la componente mayor en la red agregada</p>
+<div class="bars">
+<div class="bar"><span>Ene.</span><span class="track"><span class="fill" style="--value:94.2%"></span></span><strong>94,2 %</strong></div>
+<div class="bar"><span>Feb.</span><span class="track"><span class="fill" style="--value:93.5%"></span></span><strong>93,5 %</strong></div>
+<div class="bar"><span>Mar.</span><span class="track"><span class="fill" style="--value:87.4%"></span></span><strong>87,4 %</strong></div>
+<div class="bar"><span>Abr.</span><span class="track"><span class="fill" style="--value:85.4%"></span></span><strong>85,4 %</strong></div>
+<div class="bar"><span>May.</span><span class="track"><span class="fill" style="--value:77.6%"></span></span><strong>77,6 %</strong></div>
+<div class="bar"><span>Jun.</span><span class="track"><span class="fill" style="--value:59.9%"></span></span><strong>59,9 %</strong></div>
+</div>
+<p>En esa componente, λ₂ normalizado pasó de <b>0,03027</b> en enero a <b>0,01241</b> en junio.</p>
+<details><summary>Nota para la sustentación</summary><p>Los grafos completos de las 24 capas no vacías estaban desconectados. Los λ₂ positivos se refieren a sus componentes mayores. Enero y junio contienen cuentas distintas y volúmenes de captura diferentes.</p></details>
+</section>
+<section class="slide" aria-labelledby="s6">
+<p class="overline">Detección de comunidades</p>
+<h2 id="s6">Dos métodos, dos resoluciones</h2>
+<div class="grid"><div class="metric"><strong>8–21</strong><p>cuentas en el grupo pequeño de la bipartición espectral</p></div><div class="metric"><strong>27–79</strong><p>grupos mensuales con fusión voraz por modularidad</p></div></div>
+<p>En la red agregada, el ARI entre métodos fue de 0,0003 a 0,0181. La bipartición aísla un grupo pequeño. La modularidad ofrece una descripción más granular.</p>
+<details><summary>Nota para la sustentación</summary><p>La bipartición usa los dos primeros autovectores del laplaciano normalizado y k-medias. La fusión voraz une pares con ganancia positiva de modularidad. La diferencia de resolución importa al interpretar su baja coincidencia.</p></details>
+</section>
+<section class="slide" aria-labelledby="s7">
+<p class="overline">Continuidad y sensibilidad</p>
+<h2 id="s7">Los grupos coinciden poco entre meses</h2>
+<ul><li><b>0,083–0,222.</b> Mayor Jaccard por transición para los grupos de modularidad en la red agregada.</li><li><b>0,890–1,000.</b> ARI frente a la bipartición de referencia al duplicar el peso de respuestas o citas.</li><li><b>Cerca de cero.</b> ARI al excluir menciones en los cinco meses comparables.</li></ul>
+<details><summary>Nota para la sustentación</summary><p>Jaccard compara conjuntos completos. ARI compara la asignación de las cuentas compartidas y corrige el acuerdo esperado por azar. El mayor Jaccard corresponde al mejor par de grupos de cada transición.</p></details>
+</section>
+<section class="slide" aria-labelledby="s8">
+<p class="overline">Contexto electoral y textual</p>
+<h2 id="s8">Qué aportan las fechas y el vocabulario</h2>
+<table><caption class="caption">Publicaciones observadas alrededor de fechas electorales</caption><thead><tr><th>Hito</th><th>7 días antes</th><th>Jornada</th><th>7 días después</th></tr></thead><tbody><tr><td>8 mar. · Congreso y consultas</td><td>863</td><td>766</td><td>956</td></tr><tr><td>31 may. · Primera vuelta</td><td>211</td><td>184</td><td>320</td></tr><tr><td>21 jun. · Segunda vuelta</td><td>325</td><td>192</td><td>299</td></tr></tbody></table>
+<p>Las dos comunidades mayores de modularidad tuvieron texto suficiente para un contraste descriptivo. En enero–mayo, su similitud léxica entre grupos fue menor que dentro de ambos grupos.</p>
+<p class="caption"><a href="https://www.registraduria.gov.co/-Elecciones-2026-.html">Calendario oficial de la Registraduría</a></p>
+<details><summary>Nota para la sustentación</summary><p>Las ventanas laterales duran siete días y las jornadas duran uno. En junio, el coseno entre grupos fue 0,155 frente a 0,153 y 0,211 dentro de cada uno. El vocabulario puede compartir temas sin revelar una posición política.</p></details>
+</section>
+<section class="slide" aria-labelledby="s9">
+<p class="overline">Conclusión</p>
+<h2 id="s9">La baja continuidad se observó dentro del corpus</h2>
+<ul><li>La estructura cambia según el tipo de interacción y las cuentas presentes.</li><li>La cobertura desigual y la fragmentación limitan la comparación temporal.</li><li>La polarización ideológica queda abierta hasta contar con etiquetas políticas independientes y validadas.</li></ul>
+<details><summary>Nota para la sustentación</summary><p>Si les preguntan por el aporte principal, expliquen que el proyecto deja un flujo reproducible y muestra la sensibilidad de la partición a las decisiones de modelamiento.</p></details>
+</section>
+<section class="slide" aria-labelledby="s10">
+<p class="overline">Preguntas</p>
+<h2 id="s10">Guía breve de sustentación</h2>
+<details><summary>¿Por qué usar el laplaciano normalizado?</summary><p>Compensa la escala de los grados en la proyección simétrica. La red dirigida se conserva como representación original de las relaciones.</p></details>
+<details><summary>¿El aumento de modularidad demuestra más polarización?</summary><p>La modularidad cuantifica la concentración de conexiones internas respecto de un referente basado en los grados. La interpretación ideológica requiere validar posiciones por separado.</p></details>
+<details><summary>¿Qué se necesitaría para ampliar las conclusiones?</summary><p>Mejor homogeneidad de captura, revisión temática con dos codificadores y etiquetas políticas validadas con un referente apropiado para los tamaños y grados de los grupos.</p></details>
+</section>
+</main>
+<nav aria-label="Navegación" id="controls" hidden><button id="previous">Anterior</button><output id="progress" aria-live="polite"></output><button id="next">Siguiente</button><button id="full">Pantalla completa</button></nav>
+<script>
+const slides=[...document.querySelectorAll('.slide')];
+const nav=document.querySelector('nav');
+const previous=document.getElementById('previous');
+const next=document.getElementById('next');
+const full=document.getElementById('full');
+let index=0;
+function show(i){
+  index=Math.max(0,Math.min(slides.length-1,i));
+  slides.forEach((slide,k)=>{slide.hidden=k!==index});
+  document.getElementById('progress').textContent=(index+1)+' / '+slides.length;
+  previous.disabled=index===0;
+  next.disabled=index===slides.length-1;
+  window.scrollTo(0,0);
+}
+previous.addEventListener('click',()=>show(index-1));
+next.addEventListener('click',()=>show(index+1));
+full.hidden=!document.fullscreenEnabled;
+full.addEventListener('click',async()=>{
+  try{
+    if(document.fullscreenElement) await document.exitFullscreen();
+    else await document.documentElement.requestFullscreen();
+  }catch{full.hidden=true}
+});
+document.addEventListener('fullscreenchange',()=>{
+  full.textContent=document.fullscreenElement?'Salir de pantalla completa':'Pantalla completa';
+});
+document.addEventListener('keydown',event=>{
+  if(event.altKey||event.ctrlKey||event.metaKey||event.target.closest?.('button,summary,a'))return;
+  const moves={ArrowLeft:index-1,ArrowRight:index+1,PageUp:index-1,PageDown:index+1,Home:0,End:slides.length-1};
+  if(event.key in moves){event.preventDefault();show(moves[event.key]);}
+});
+nav.hidden=false;
+show(0);
+</script>
+</body>
+</html>

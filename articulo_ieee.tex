@@ -1,0 +1,141 @@
+\documentclass[journal]{IEEEtran}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[spanish,es-noquoting]{babel}
+\usepackage{amsmath,amssymb,booktabs}
+\usepackage[hidelinks]{hyperref}
+\title{Evolución temporal de comunidades de interacción política en X durante el ciclo presidencial colombiano de 2026}
+\author{Juan Sebastian Mora Cabrera y Sara Valentina Figueredo Laserna%
+\thanks{Universidad del Rosario, Teoría de Grafos, 2026-II. Profesor: Daniel Alfonso Bojacá Torres.}}
+\begin{document}
+\maketitle
+\begin{abstract}
+Se caracterizó la estructura mensual de las interacciones entre cuentas de X observadas en búsquedas sobre política y candidaturas colombianas de enero a junio de 2026. Se verificaron 28 capturas Zeeschuimer y se conservaron 37\,069 publicaciones únicas de 39\,787 registros. Se construyeron redes dirigidas de respuestas, menciones y citas. Sobre la componente mayor de cada proyección simétrica se comparó una bipartición espectral con una partición por optimización voraz de modularidad. En la red agregada, la optimización produjo entre 27 y 79 grupos mensuales. El máximo Jaccard por transición varió de 0,083 a 0,222 con ese método. Excluir menciones cambió la bipartición en los cinco meses con comparación informativa. Se corroboraron 42 eventos y se revisó la pertinencia temática de 48 publicaciones. Los resultados describen conectividad y continuidad en el corpus observado. La medición de polarización ideológica queda abierta.
+\end{abstract}
+\begin{IEEEkeywords}
+Análisis espectral, comunidades, modularidad, redes temporales, teoría de grafos.
+\end{IEEEkeywords}
+
+\section{Introducción}
+Las relaciones entre cuentas en X permiten estudiar cómo se organiza una conversación en distintos periodos. Las redes temporales formalizan esos cambios sin exigir que las mismas cuentas estén presentes en todas las ventanas~\cite{holme}. Este estudio combina matrices laplacianas, particiones y mediciones de continuidad para analizar un corpus de búsquedas relacionadas con cuatro figuras políticas colombianas: Iván Cepeda, Abelardo de la Espriella, Sergio Fajardo y Paloma Valencia.
+
+\section{Descripción del problema}
+La pregunta principal es cómo cambian la conectividad y las comunidades observadas entre enero y junio de 2026, y cuánto dependen los resultados del tipo de interacción. También se examina la estructura alrededor de hitos electorales y se compara el vocabulario de cuentas con texto suficiente. La cobertura depende de las búsquedas y las publicaciones que pudieron recuperarse. Una relación observable entre cuentas puede corresponder a apoyo, crítica u otros propósitos. La inferencia ideológica requiere evidencia sobre el contenido y la posición de las cuentas.
+
+\section{Objetivos}
+\subsection{Objetivo general}
+Caracterizar la evolución mensual de las comunidades de interacción política observadas en X durante el ciclo presidencial colombiano de enero a junio de 2026 mediante grafos por tipo de interacción, métricas espectrales y comparación de particiones.
+\subsection{Objetivos específicos}
+\begin{enumerate}
+\item Auditar la integridad, los identificadores, las fechas, los duplicados y la cobertura, y revisar una muestra de textos e interacciones.
+\item Construir grafos mensuales dirigidos y ponderados, matrices de adyacencia y laplacianos normalizados.
+\item Caracterizar la conectividad y contrastar la bipartición espectral con una partición por modularidad.
+\item Medir continuidad temporal y sensibilidad a pesos, y contextualizar los resultados con el calendario electoral.
+\item Evaluar si el texto permite comparar vocabulario y delimitar los requisitos para interpretar polarización ideológica.
+\item Documentar el flujo de cálculo y las comprobaciones de reproducibilidad.
+\end{enumerate}
+
+\section{Marco teórico}
+Para una adyacencia simétrica ponderada $S$ y su matriz diagonal de grados $D$, el laplaciano combinatorio es $L=D-S$. En un grafo no dirigido desconectado con al menos dos nodos, $\lambda_2(L)=0$~\cite{fiedler}. En nodos de grado positivo, el laplaciano normalizado es $\mathcal{L}=I-D^{-1/2}SD^{-1/2}$~\cite{chung}. Sus primeros autovectores pueden utilizarse para representar los nodos antes de agruparlos~\cite{luxburg}.
+
+Para asignaciones $c_i$ de los nodos, la modularidad ponderada compara las conexiones internas con las esperadas bajo un referente basado en los grados~\cite{newman}:
+\begin{equation}
+Q=\frac{1}{2m}\sum_{ij}\left(S_{ij}-\frac{d_i d_j}{2m}\right)\mathbf{1}_{c_i=c_j},
+\qquad 2m=\sum_i d_i .
+\end{equation}
+El índice $J(C,B)=|C\cap B|/|C\cup B|$ mide el solapamiento de dos comunidades. El índice de Rand ajustado (ARI) compara dos particiones sobre las mismas cuentas y ajusta el acuerdo esperado por azar~\cite{hubert}.
+
+\section{Modelamiento del problema}
+La unidad de observación es una publicación. Los identificadores se trataron como texto y el mes se asignó usando la fecha de publicación en Bogotá (UTC$-5$). Se consolidaron las copias por identificador de publicación utilizando sus metadatos compatibles.
+
+Para el mes $t$ y tipo $r$, $A^{(t,r)}_{ij}$ cuenta eventos del autor $i$ al destinatario $j$. Cada combinación de publicación, tipo y destinatario aporta como máximo una unidad. Los nodos de cada matriz son las cuentas incidentes a alguna arista. Se conservaron los autolazos en el registro de eventos y se excluyeron de las matrices. La adyacencia agregada y su proyección son
+\begin{equation}
+A^{(t)}=\sum_r\alpha_r A^{(t,r)},\qquad S^{(t)}=A^{(t)}+(A^{(t)})^{\mathsf T}.
+\end{equation}
+Se empleó $\alpha_r=1$ en la referencia. Los contadores de vistas y otras reacciones se conservaron como metadatos de publicación. Las capas de republicación quedaron vacías por falta de referencias estructuradas a destinatarios.
+
+\section{Solución propuesta e implementación}
+\subsection{Auditoría}
+Se cotejaron tamaños y hashes SHA-256 de las exportaciones originales y se registró la procedencia por archivo y línea. Las respuestas se resolvieron mediante el ID del destinatario. Las citas se resolvieron mediante el autor del objeto anidado o una búsqueda por el ID de la publicación citada. Para menciones se usaron las entidades del texto principal y largo. Se tomaron dos eventos no reflexivos de cada tipo por mes y se añadieron los seis casos de cita resueltos por búsqueda. La revisión temática seleccionó ocho publicaciones por mes con semilla fija y clasificó el texto disponible en cuatro categorías.
+
+\subsection{Espectro, particiones y robustez}
+Se analizó la componente débil mayor de cada capa no vacía tras simetrizar. Para componentes de hasta 256 nodos se empleó diagonalización densa. Para tamaños mayores se usó aproximación de Ritz con semilla fija y comprobación de residuales. Se normalizaron por fila los dos primeros autovectores y se aplicó $k$-medias con $k=2$ y 20 reinicios. El contraste aglomerativo empezó con grupos unitarios y fusionó sucesivamente el par de mayor ganancia positiva de modularidad. Se examinó la sensibilidad al binarizar pesos, duplicar respuestas o citas y excluir las menciones. Entre meses se compararon los conjuntos completos mediante Jaccard y las biparticiones sobre cuentas compartidas mediante ARI, cuando ambas conservaron dos grupos sobre ese conjunto.
+
+\subsection{Calendario y texto}
+Se analizaron las jornadas y los siete días a cada lado de tres hitos oficiales~\cite{registraduria}. Para el texto en español se construyeron vectores TF-IDF por mes y autor, sin URL ni menciones, con al menos cinco publicaciones utilizables por cuenta. Se exigieron al menos cinco cuentas elegibles por grupo. Se comparó el coseno medio dentro y entre grupos, con hasta 3\,000 pares por contraste.
+
+\section{Resultados}
+\subsection{Corpus y control de calidad}
+Las 28 capturas coincidieron con el manifiesto. De 39\,787 filas se retiraron 2\,667 copias adicionales y 51 publicaciones únicas fuera de ventana. El resultado fue un corpus de 37\,069 publicaciones. En 458 filas el mes de publicación difirió del de la carpeta. Los únicos días sin publicaciones observadas fueron el 2 de mayo y el 27 de junio.
+
+Se registraron 43\,901 eventos resueltos, incluidos 764 autolazos. Las matrices excluyen estos últimos y las aristas ponderadas por mes y tipo suman 35\,832. Se resolvieron 11\,197 respuestas, 2\,951 citas y 29\,753 menciones a destinatarios distintos por publicación. Quedaron 135 citas sin destinatario. Los 42 eventos revisados coincidieron con los metadatos originales. De los 48 textos revisados, 32 fueron electorales explícitos, 12 políticos sin vínculo electoral explícito, tres de contexto insuficiente y uno fuera de tema.
+
+\begin{table}[t]
+\centering
+\caption{Cobertura y conectividad de la red agregada}
+\label{tab:mensual}
+\begin{tabular}{lrrrrr}
+\toprule
+Mes & Pub. & Días & Nodos & CM (\%) & $\lambda_2$ CM\\
+\midrule
+Ene. & 16\,149 & 31/31 & 5\,822 & 94,2 & 0,03027\\
+Feb. & 9\,231 & 28/28 & 3\,234 & 93,5 & 0,02745\\
+Mar. & 4\,241 & 31/31 & 1\,454 & 87,4 & 0,02280\\
+Abr. & 4\,153 & 30/30 & 1\,345 & 85,4 & 0,02536\\
+May. & 1\,855 & 30/31 & 735 & 77,6 & 0,01598\\
+Jun. & 1\,440 & 29/30 & 599 & 59,9 & 0,01241\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Conectividad, comunidades y estabilidad}
+Se verificaron 30 adyacencias y 30 laplacianos normalizados, incluidas las capas vacías. Las 24 redes no vacías fueron desconectadas. Los dos primeros pares propios alcanzaron residuales de $10^{-7}$ o menores en las componentes mayores (CM). La Tabla~\ref{tab:mensual} reporta el segundo autovalor normalizado en la CM de cada red agregada. En respuestas, la componente mayor tuvo 26 de 340 nodos en mayo y 10 de 255 en junio.
+
+\begin{table}[t]
+\centering
+\caption{Particiones de la componente mayor agregada}
+\label{tab:grupos}
+\begin{tabular}{lrrrr}
+\toprule
+Mes & Grupo menor$^{a}$ & $Q^{a}$ & Grupos$^{b}$ & $Q^{b}$\\
+\midrule
+Ene. & 11 & 0,0011 & 79 & 0,5351\\
+Feb. & 9 & 0,0020 & 60 & 0,5859\\
+Mar. & 10 & 0,0083 & 38 & 0,6685\\
+Abr. & 21 & 0,0212 & 36 & 0,5998\\
+May. & 8 & 0,0238 & 29 & 0,7299\\
+Jun. & 16 & 0,0573 & 27 & 0,7126\\
+\bottomrule
+\end{tabular}\\
+\footnotesize $^{a}$ Bipartición espectral. $^{b}$ Fusión voraz por modularidad.
+\end{table}
+
+La bipartición agregada separó un grupo pequeño de 8 a 21 cuentas (Tabla~\ref{tab:grupos}). El ARI entre métodos fue de 0,0003 a 0,0181. Sus resoluciones difieren y los valores de modularidad se interpretan como medidas descriptivas. Los cortes de respuestas fueron más equilibrados en febrero (610 y 1\,054 cuentas) y abril (96 y 104).
+
+El mayor Jaccard de cada transición agregada varió entre 0,134 y 0,228 para la bipartición, y entre 0,083 y 0,222 para el método voraz. El ARI espectral entre meses fue cercano a cero. Duplicar respuestas o citas conservó ARI de 0,890 a 1,000 frente a la referencia. Al excluir menciones, los cinco ARI calculables quedaron cerca de cero. Binarizar pesos cambió sustancialmente la bipartición en cuatro de seis meses.
+
+\subsection{Calendario y similitud léxica}
+Se observaron 863, 766 y 956 publicaciones en las ventanas anterior, de jornada y posterior al 8 de marzo. En torno a la primera vuelta del 31 de mayo se observaron 211, 184 y 320. En torno a la segunda vuelta del 21 de junio se observaron 325, 192 y 299. La ventana posterior a la segunda vuelta tuvo un día sin registros. Las ventanas laterales duran siete días y la jornada dura uno. Las series describen las capturas alrededor de los hitos.
+
+El grupo pequeño de las biparticiones tuvo de cero a tres cuentas elegibles. Las dos comunidades mayores de modularidad sí cumplieron el mínimo en los seis meses. Entre enero y mayo el coseno medio entre esos grupos fue inferior a ambos promedios internos. En junio el promedio entre grupos fue 0,155 y los internos fueron 0,153 y 0,211. El contraste comprende solo dos grupos por mes y cuentas con suficiente texto. No se estimó significancia estadística.
+
+\section{Discusión y limitaciones}
+La escasa coincidencia entre grupos consecutivos describe tanto la organización observada como la rotación de cuentas, la fragmentación y el volumen de la muestra. El tamaño de la componente mayor varió sustancialmente. Los valores espectrales corresponden a componentes de distinta composición. La revisión de aristas comprueba eventos extraídos y deja abiertas las interacciones omitidas. La revisión temática fue balanceada por mes e incluyó una sola codificación por texto.
+
+El estudio da una caracterización estructural y un contraste descriptivo de vocabulario. La medición ideológica requeriría etiquetas externas, evaluación del acuerdo entre revisores y un referente que considere los grados y tamaños de categorías. Los datos tampoco permiten atribuir cambios a eventos electorales de manera causal.
+
+\section{Conclusiones y reproducibilidad}
+La auditoría, el modelamiento, el diagnóstico espectral y la comparación de comunidades se ejecutaron sobre seis meses de datos. La red agregada mostró baja continuidad en las particiones evaluadas. Las menciones tuvieron un papel importante en la bipartición. La interpretación ideológica quedó abierta.
+
+Los programas \texttt{auditar.py}, \texttt{verificar.py}, \texttt{comunidades.py}, \texttt{validar\_objetivos.py}, \texttt{contraste\_textual.py} y \texttt{muestra\_revision.py} reproducen las tablas con Python y NumPy a partir de las capturas y el manifiesto. Los datos y las fichas con texto se mantienen separados del código.
+
+\begin{thebibliography}{7}
+\bibitem{holme} P. Holme y J. Saramäki, \emph{Temporal networks}, Physics Reports, vol. 519, pp. 97--125, 2012.
+\bibitem{fiedler} M. Fiedler, \emph{Algebraic connectivity of graphs}, Czechoslovak Mathematical Journal, vol. 23, pp. 298--305, 1973.
+\bibitem{chung} F. R. K. Chung, \emph{Spectral Graph Theory}. American Mathematical Society, 1997.
+\bibitem{luxburg} U. von Luxburg, \emph{A tutorial on spectral clustering}, Statistics and Computing, vol. 17, pp. 395--416, 2007.
+\bibitem{newman} M. E. J. Newman, \emph{Modularity and community structure in networks}, PNAS, vol. 103, pp. 8577--8582, 2006.
+\bibitem{hubert} L. Hubert y P. Arabie, \emph{Comparing partitions}, Journal of Classification, vol. 2, pp. 193--218, 1985.
+\bibitem{registraduria} Registraduría Nacional del Estado Civil, \emph{Elecciones 2026}. \url{https://www.registraduria.gov.co/-Elecciones-2026-.html}.
+\end{thebibliography}
+\end{document}
